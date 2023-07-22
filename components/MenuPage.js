@@ -20,8 +20,9 @@ export class MenuPage extends HTMLElement {
         this.root.appendChild(content);
 
         window.addEventListener("menuchangehua", () => {
-            this.render();
+            this.render();  // this is to update the menu
         })
+        this.render(); // this is to render the menu first time
     }
 
     render() {

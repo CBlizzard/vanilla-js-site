@@ -1,4 +1,9 @@
 export class OrderPage extends HTMLElement {
+    #user = {
+        name: "",
+        email: "",
+        phone: "",
+    }
 
     constructor() {
         super();
@@ -24,6 +29,8 @@ export class OrderPage extends HTMLElement {
     }
 
     render() {
+
+
         let section = this.root.querySelector("section");
         if (kamui.store.cart.length == 0) {
             section.innerHTML = `
@@ -56,6 +63,41 @@ export class OrderPage extends HTMLElement {
               </li>                
           `;
         }
+        this.setFormBindings(this.root.querySelector("form"));
+        // "this.root" because it is in shadow DOM, not in regular DOM 
+    }
+
+    setFormBindings(form) {
+        form.addEventListener("submit", e => {
+            e.preventDefault()
+            alert(`Thanks for your order, ${this.#user.name}!`)
+
+            this.#user.name = "";
+            this.#user.email = "";
+            this.#user.phone = "";
+
+            // now send data to server
+        })
+
+        // setting double data binding 
+
+        // 1. user values are changed, then form values are changed
+        this.#user = new Proxy(this.#user, {
+            set(target, property, value) {
+                target[property] = value;
+                form.elements[property].value = value;
+                return true; // whenever we use setter, we need to return true
+            }
+        })
+
+        // 2. form values are changed, then user values are changed
+        Array.from(form.elements).forEach(element => {
+            element.addEventListener("change", (event) => {
+                this.#user[element.name] = element.value;
+            })
+        })
+
+
     }
 }
 
